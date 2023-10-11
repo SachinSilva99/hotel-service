@@ -14,4 +14,5 @@ public class HotelPackageDTO {
     private HotelPackageType hotelPackageType;
     private HotelPackageRoomType hotelPackageRoomType;
     private double hotelPackagePrice;
+    private String hotelId;
 }

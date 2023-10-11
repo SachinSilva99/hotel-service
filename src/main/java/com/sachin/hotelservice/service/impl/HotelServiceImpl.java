@@ -1,4 +1,4 @@
-package com.sachin.hotelservice.service;
+package com.sachin.hotelservice.service.impl;
 
 import com.sachin.hotelservice.dto.HotelDTO;
 import com.sachin.hotelservice.entity.Hotel;
@@ -9,6 +9,7 @@ import com.sachin.hotelservice.exception.NotFoundException;
 import com.sachin.hotelservice.repo.HotelImageRepo;
 import com.sachin.hotelservice.repo.HotelPackageRepo;
 import com.sachin.hotelservice.repo.HotelRepo;
+import com.sachin.hotelservice.service.HotelService;
 import com.sachin.hotelservice.util.mapper.Mapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -139,7 +140,6 @@ public class HotelServiceImpl implements HotelService {
 
     private HotelDTO getHotelDTO(Hotel hotel) {
         HotelDTO hotelDto = mapper.toHotelDto(hotel);
-
         List<String> list = hotel.getHotelImages().stream().map(HotelImage::getHotelImgValue).toList();
         hotelDto.setHotelImagesStrings(list);
         return hotelDto;
