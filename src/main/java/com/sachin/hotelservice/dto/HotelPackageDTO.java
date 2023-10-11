@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 public class HotelPackageDTO {
+    private String hotelPackageId;
     private HotelPackageType hotelPackageType;
     private HotelPackageRoomType hotelPackageRoomType;
     private double hotelPackagePrice;

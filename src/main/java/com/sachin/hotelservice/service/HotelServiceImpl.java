@@ -3,9 +3,11 @@ package com.sachin.hotelservice.service;
 import com.sachin.hotelservice.dto.HotelDTO;
 import com.sachin.hotelservice.entity.Hotel;
 import com.sachin.hotelservice.entity.HotelImage;
+import com.sachin.hotelservice.entity.HotelPackage;
 import com.sachin.hotelservice.entity.enums.HotelCategory;
 import com.sachin.hotelservice.exception.NotFoundException;
 import com.sachin.hotelservice.repo.HotelImageRepo;
+import com.sachin.hotelservice.repo.HotelPackageRepo;
 import com.sachin.hotelservice.repo.HotelRepo;
 import com.sachin.hotelservice.util.mapper.Mapper;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +24,7 @@ public class HotelServiceImpl implements HotelService {
 
     private final HotelRepo hotelRepo;
     private final HotelImageRepo hotelImageRepo;
+    private final HotelPackageRepo hotelPackageRepo;
     private final Mapper mapper;
 
     @Override
@@ -30,20 +33,18 @@ public class HotelServiceImpl implements HotelService {
         Hotel hotel = mapper.toHotel(hotelDTO);
         String hotel_id = hotelRepo.save(hotel).getHotel_id();
 
-        hotelDTO.getHotelImagesRequest().stream().map(multipartFile -> {
-            try {
-                String imageString = Base64.getEncoder().encodeToString(multipartFile.getBytes());
+        hotelDTO.getHotelImagesStrings().forEach(imageString -> {
+            HotelImage hotelImage = HotelImage.builder()
+                    .hotelImgValue(imageString)
+                    .hotel(hotel).build();
+            hotelImageRepo.save(hotelImage);
+        });
 
-                HotelImage hotelImage = new HotelImage();
-                hotelImage.setHotelImgValue(imageString);
-                hotelImage.setHotel(hotel);
-
-                hotelImageRepo.save(hotelImage);
-                return hotelImage;
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }).toList().forEach(hotelImage -> hotel.getHotelImages().add(hotelImage));
+        hotelDTO.getHotelPackageDTOS().forEach(hotelPackageDTO -> {
+            HotelPackage hotelPackage = mapper.toHotelPackage(hotelPackageDTO);
+            hotelPackage.setHotel(hotel);
+            hotelPackageRepo.save(hotelPackage);
+        });
         return hotel_id;
     }
 
@@ -76,18 +77,17 @@ public class HotelServiceImpl implements HotelService {
         hotel.setHotelCancellationCost(hotelDTO.getHotelCancellationCost());
         hotel.setHotelRemarks(hotelDTO.getHotelRemarks());
 
-        hotelDTO.getHotelImagesRequest().stream().map(multipartFile -> {
-            try {
-                String imageString = Base64.getEncoder().encodeToString(multipartFile.getBytes());
-                HotelImage hotelImage = new HotelImage();
-                hotelImage.setHotelImgValue(imageString);
-                hotelImage.setHotel(hotel);
-                hotelImageRepo.save(hotelImage);
-                return hotelImage;
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }).toList().forEach(hotelImage -> hotel.getHotelImages().add(hotelImage));
+        hotelDTO.getHotelImagesStrings().forEach(imageString -> {
+            HotelImage hotelImage = HotelImage.builder()
+                    .hotelImgValue(imageString)
+                    .hotel(hotel).build();
+            hotelImageRepo.save(hotelImage);
+        });
+        hotelDTO.getHotelPackageDTOS().forEach(hotelPackageDTO -> {
+            HotelPackage hotelPackage = mapper.toHotelPackage(hotelPackageDTO);
+            hotelPackage.setHotel(hotel);
+            hotelPackageRepo.save(hotelPackage);
+        });
 
         hotelRepo.save(hotel);
 
@@ -141,7 +141,7 @@ public class HotelServiceImpl implements HotelService {
         HotelDTO hotelDto = mapper.toHotelDto(hotel);
 
         List<String> list = hotel.getHotelImages().stream().map(HotelImage::getHotelImgValue).toList();
-        hotelDto.setHotelImagesResponse(list);
+        hotelDto.setHotelImagesStrings(list);
         return hotelDto;
     }
 }

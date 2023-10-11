@@ -58,10 +58,9 @@ public class HotelDTO {
     private String hotelRemarks;
 
     @NotEmpty
-    private List<MultipartFile> hotelImagesRequest;
+    private List<String> hotelImagesStrings = new ArrayList<>();
 
-    private List<String> hotelImagesResponse;
-
-    private HotelPackageDTO hotelPackageDTOS;
+    @NotEmpty
+    private List<HotelPackageDTO> hotelPackageDTOS = new ArrayList<>();
 
 }

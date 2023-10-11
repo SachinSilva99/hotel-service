@@ -55,9 +55,9 @@ public class Hotel {
     @Column(nullable = false)
     private String hotelRemarks;
 
-    @OneToMany(mappedBy = "hotel")
+    @OneToMany(mappedBy = "hotel", cascade = CascadeType.ALL)
     private List<HotelImage> hotelImages = new ArrayList<>();
 
-    @OneToMany(mappedBy = "hotel")
+    @OneToMany(mappedBy = "hotel", cascade = CascadeType.ALL)
     private List<HotelPackage> hotelPackageList = new ArrayList<>();
 }

@@ -1,18 +1,10 @@
 package com.sachin.hotelservice.api;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sachin.hotelservice.dto.HotelDTO;
 import com.sachin.hotelservice.dto.HotelPackageDTO;
 import com.sachin.hotelservice.entity.enums.HotelCategory;
-import com.sachin.hotelservice.exception.InValidDataException;
 import com.sachin.hotelservice.service.HotelService;
 import com.sachin.hotelservice.util.StandardResponse;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -21,7 +13,8 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.InputMismatchException;
+import java.io.IOException;
+import java.util.Base64;
 import java.util.List;
 
 @RestController
@@ -34,18 +27,28 @@ public class HotelController {
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<StandardResponse> createHotel(
             @RequestPart
-            List<HotelPackageDTO> data,
-            @RequestPart List<MultipartFile> hotelImagesRequest
-
+            List<HotelPackageDTO> hotelPackageDTOS,
+            @RequestPart List<MultipartFile> hotelImagesRequest,
+            @RequestPart HotelDTO hotelDTO
     ) {
-//        String hotelId = hotelService.createHotel(hotelDTO);
-//        return new ResponseEntity<>(
-//                new StandardResponse(HttpStatus.CREATED.value(), hotelId + " Created Hotel", hotelId),
-//                HttpStatus.CREATED);
 
-        System.out.println(data);
-        System.out.println(hotelImagesRequest);
-        return null;
+        hotelDTO.setHotelPackageDTOS(hotelPackageDTOS);
+        hotelImagesRequest.forEach(multipartFile -> {
+            try {
+                String imageString = Base64.getEncoder().encodeToString(multipartFile.getBytes());
+                hotelDTO.getHotelImagesStrings().add(imageString);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
+
+        hotelDTO.setHotelPackageDTOS(hotelPackageDTOS);
+        String hotelId = hotelService.createHotel(hotelDTO);
+        return new ResponseEntity<>(
+                new StandardResponse(HttpStatus.CREATED.value(), hotelId + " Created Hotel", hotelId),
+                HttpStatus.CREATED);
+
+
     }
 
     @GetMapping(value = "/{hotelId}")
@@ -64,6 +67,7 @@ public class HotelController {
 
     @DeleteMapping("/{hotelId}")
     public ResponseEntity<StandardResponse> deleteHotel(@PathVariable String hotelId) {
+        hotelService.delete(hotelId);
         return new ResponseEntity<>(
                 new StandardResponse(),
                 HttpStatus.NO_CONTENT);
