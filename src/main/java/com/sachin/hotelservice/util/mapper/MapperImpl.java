@@ -1,8 +1,10 @@
 package com.sachin.hotelservice.util.mapper;
 
 import com.sachin.hotelservice.dto.HotelDTO;
+import com.sachin.hotelservice.dto.HotelImageDTO;
 import com.sachin.hotelservice.dto.HotelPackageDTO;
 import com.sachin.hotelservice.entity.Hotel;
+import com.sachin.hotelservice.entity.HotelImage;
 import com.sachin.hotelservice.entity.HotelPackage;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -31,5 +33,15 @@ public class MapperImpl implements Mapper {
     @Override
     public HotelPackage toHotelPackage(HotelPackageDTO hotelPackageDTO) {
         return mapper.map(hotelPackageDTO, HotelPackage.class);
+    }
+
+    @Override
+    public HotelImageDTO toHotelImageDto(HotelImage hotelImage) {
+        return mapper.map(hotelImage, HotelImageDTO.class);
+    }
+
+    @Override
+    public HotelImage toHotelImage(HotelImageDTO hotelImageDTO) {
+        return mapper.map(hotelImageDTO, HotelImage.class);
     }
 }

@@ -1,6 +1,7 @@
 package com.sachin.hotelservice.service.impl;
 
 import com.sachin.hotelservice.dto.HotelDTO;
+import com.sachin.hotelservice.dto.HotelPackageDTO;
 import com.sachin.hotelservice.entity.Hotel;
 import com.sachin.hotelservice.entity.HotelImage;
 import com.sachin.hotelservice.entity.HotelPackage;
@@ -38,12 +39,13 @@ public class HotelServiceImpl implements HotelService {
             HotelImage hotelImage = HotelImage.builder()
                     .hotelImgValue(imageString)
                     .hotel(hotel).build();
+            hotel.getHotelImages().add(hotelImage);
             hotelImageRepo.save(hotelImage);
         });
-
         hotelDTO.getHotelPackageDTOS().forEach(hotelPackageDTO -> {
             HotelPackage hotelPackage = mapper.toHotelPackage(hotelPackageDTO);
             hotelPackage.setHotel(hotel);
+            hotel.getHotelPackageList().add(hotelPackage);
             hotelPackageRepo.save(hotelPackage);
         });
         return hotel_id;
@@ -82,11 +84,13 @@ public class HotelServiceImpl implements HotelService {
             HotelImage hotelImage = HotelImage.builder()
                     .hotelImgValue(imageString)
                     .hotel(hotel).build();
+            hotel.getHotelImages().add(hotelImage);
             hotelImageRepo.save(hotelImage);
         });
         hotelDTO.getHotelPackageDTOS().forEach(hotelPackageDTO -> {
             HotelPackage hotelPackage = mapper.toHotelPackage(hotelPackageDTO);
             hotelPackage.setHotel(hotel);
+            hotel.getHotelPackageList().add(hotelPackage);
             hotelPackageRepo.save(hotelPackage);
         });
 
@@ -140,8 +144,14 @@ public class HotelServiceImpl implements HotelService {
 
     private HotelDTO getHotelDTO(Hotel hotel) {
         HotelDTO hotelDto = mapper.toHotelDto(hotel);
-        List<String> list = hotel.getHotelImages().stream().map(HotelImage::getHotelImgValue).toList();
-        hotelDto.setHotelImagesStrings(list);
+
+        List<String> hotelImageStrings = hotel.getHotelImages().stream().map(HotelImage::getHotelImgValue).toList();
+
+        List<HotelPackageDTO> hotelPackageDTOS =
+                hotel.getHotelPackageList().stream().map(mapper::toHotelPackageDto).toList();
+
+        hotelDto.setHotelPackageDTOS(hotelPackageDTOS);
+        hotelDto.setHotelImagesStrings(hotelImageStrings);
         return hotelDto;
     }
 }
