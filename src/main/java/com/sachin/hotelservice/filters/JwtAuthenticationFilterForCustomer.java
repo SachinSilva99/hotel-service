@@ -5,6 +5,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -19,6 +20,8 @@ import java.io.IOException;
 
 
 public class JwtAuthenticationFilterForCustomer extends OncePerRequestFilter {
+    @Value("${security.customerApiUrl}")
+    private String customerApiUrl;
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
@@ -26,10 +29,7 @@ public class JwtAuthenticationFilterForCustomer extends OncePerRequestFilter {
         String authorizationHeader = request.getHeader("Authorization");
         if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
             String jwtToken = authorizationHeader.substring(7);
-
-            String apiUrl = "http://localhost:8090/userservice/api/v1/gethotel";
-            ResponseEntity<String> hotelResponse = makeAuthenticatedRequest(apiUrl, jwtToken);
-
+            ResponseEntity<String> hotelResponse = makeAuthenticatedRequest(customerApiUrl, jwtToken);
             if (hotelResponse.getStatusCode() == HttpStatus.OK) {
                 System.out.println("ok");
                 filterChain.doFilter(request, response);

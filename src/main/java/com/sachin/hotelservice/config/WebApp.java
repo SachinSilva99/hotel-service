@@ -23,7 +23,6 @@ public class WebApp {
 
         registrationBean.setFilter(new JwtAuthenticationFilterForCustomer());
         registrationBean.addUrlPatterns("/api/v1/get/*");
-
         return registrationBean;
     }
     @Bean
@@ -33,7 +32,6 @@ public class WebApp {
 
         registrationBean.setFilter(new JwtAuthenticationFilter());
         registrationBean.addUrlPatterns("/api/v1/hotels/*");
-
         return registrationBean;
     }
  /*   @Bean

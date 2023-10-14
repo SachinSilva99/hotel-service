@@ -5,11 +5,10 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.core.annotation.Order;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.ClientRequest;
@@ -18,6 +17,11 @@ import org.springframework.web.reactive.function.client.WebClient;
 import java.io.IOException;
 
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
+
+
+    @Value("${security.hotelAdminUrl}")
+    private String hotelAdminAPIUrl;
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
@@ -25,10 +29,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String authorizationHeader = request.getHeader("Authorization");
         if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
             String jwtToken = authorizationHeader.substring(7);
-
-            String apiUrl = "http://localhost:8090/userservice/api/v1/hotel";
-            ResponseEntity<String> hotelResponse = makeAuthenticatedRequest(apiUrl, jwtToken);
-
+            ResponseEntity<String> hotelResponse = makeAuthenticatedRequest(hotelAdminAPIUrl, jwtToken);
             if (hotelResponse.getStatusCode() == HttpStatus.OK) {
                 System.out.println("hotel admin ok");
                 filterChain.doFilter(request, response);
