@@ -57,8 +57,7 @@ public class HotelServiceImpl implements HotelService {
         if (byId.isEmpty()) {
             throw new NotFoundException("hotel id : " + hotelId + " not found");
         }
-        Hotel hotel = byId.get();
-        return getHotelDTO(hotel);
+      return mapper.toHotelDto(byId.get());
     }
 
 
@@ -110,17 +109,19 @@ public class HotelServiceImpl implements HotelService {
 
     @Override
     public List<HotelDTO> getHotelDtos() {
-        return hotelRepo.findAll().stream().map(this::getHotelDTO).toList();
+        List<HotelDTO> list = hotelRepo.findAll().stream().map(mapper::toHotelDto).toList();
+        System.out.println(list);
+        return list;
     }
 
     @Override
     public List<HotelDTO> findHotelsWithCategory(HotelCategory hotelCategory) {
-        return hotelRepo.findAllByHotelCategory(hotelCategory).stream().map(this::getHotelDTO).toList();
+        return hotelRepo.findAllByHotelCategory(hotelCategory).stream().map(mapper::toHotelDto).toList();
     }
 
     @Override
     public List<HotelDTO> findHotelsWithIsPetsAllowed(boolean isPetsAllowed) {
-        return hotelRepo.findAllByIsHotelPetsAllowed(isPetsAllowed).stream().map(this::getHotelDTO).toList();
+        return hotelRepo.findAllByIsHotelPetsAllowed(isPetsAllowed).stream().map(mapper::toHotelDto).toList();
     }
 
     @Override
@@ -128,7 +129,7 @@ public class HotelServiceImpl implements HotelService {
         return hotelRepo
                 .findAllByIsHotelCancellationCriteriaFree(isCancellationCriteriaFree)
                 .stream()
-                .map(this::getHotelDTO)
+                .map(mapper::toHotelDto)
                 .toList();
     }
 
@@ -139,10 +140,10 @@ public class HotelServiceImpl implements HotelService {
                 .findAllByHotelCategoryAndIsHotelCancellationCriteriaFreeAndIsHotelPetsAllowed(
                         hotelCategory,
                         isHotelCancellationCriteria,
-                        isHotelPetsAllowed).stream().map(this::getHotelDTO).toList();
+                        isHotelPetsAllowed).stream().map(mapper::toHotelDto).toList();
     }
 
-    private HotelDTO getHotelDTO(Hotel hotel) {
+/*    private HotelDTO getHotelDTO(Hotel hotel) {
         HotelDTO hotelDto = mapper.toHotelDto(hotel);
 
         List<String> hotelImageStrings = hotel.getHotelImages().stream().map(HotelImage::getHotelImgValue).toList();
@@ -153,5 +154,5 @@ public class HotelServiceImpl implements HotelService {
         hotelDto.setHotelPackageDTOS(hotelPackageDTOS);
         hotelDto.setHotelImagesStrings(hotelImageStrings);
         return hotelDto;
-    }
+    }*/
 }

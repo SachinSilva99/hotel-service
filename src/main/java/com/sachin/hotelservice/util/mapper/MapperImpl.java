@@ -10,6 +10,8 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
 @RequiredArgsConstructor
 public class MapperImpl implements Mapper {
@@ -22,7 +24,22 @@ public class MapperImpl implements Mapper {
 
     @Override
     public HotelDTO toHotelDto(Hotel hotel) {
-        return mapper.map(hotel, HotelDTO.class);
+        HotelDTO hotelDTO = mapper.map(hotel, HotelDTO.class);
+        List<HotelPackageDTO> hotelPackageDTOS = hotel.getHotelPackageList().stream().map(hotelPackage -> {
+            HotelPackageDTO hotelPackageDTO = mapper.map(hotelPackage, HotelPackageDTO.class);
+            hotelPackageDTO.setHotelId(hotelPackage.getHotel().getHotel_id());
+            return hotelPackageDTO;
+        }).toList();
+
+        List<String> hotelImageStrings = hotel.getHotelImages().stream().map(hotelImage -> {
+            HotelImageDTO hotelImageDTO = mapper.map(hotelImage, HotelImageDTO.class);
+            hotelImageDTO.setHotelId(hotelImage.getHotel().getHotel_id());
+            return hotelImageDTO.getHotelImgValue();
+        }).toList();
+
+        hotelDTO.setHotelImagesStrings(hotelImageStrings);
+        hotelDTO.setHotelPackageDTOS(hotelPackageDTOS);
+        return hotelDTO;
     }
 
     @Override
@@ -32,7 +49,8 @@ public class MapperImpl implements Mapper {
 
     @Override
     public HotelPackage toHotelPackage(HotelPackageDTO hotelPackageDTO) {
-        return mapper.map(hotelPackageDTO, HotelPackage.class);
+        HotelPackage hotelPackage = mapper.map(hotelPackageDTO, HotelPackage.class);
+        return hotelPackage;
     }
 
     @Override
